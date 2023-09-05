@@ -10,13 +10,60 @@ source:
     https://pypi.org/project/speedtest-cli/
 
     https://medium.com/pythonhive/python-decorator-to-measure-the-execution-time-of-methods-fa04cb6bb36d
+
+    https://stackoverflow.com/questions/32490629/getting-todays-date-in-yyyy-mm-dd-in-python
+
+    https://stackoverflow.com/questions/3961581/in-python-how-to-display-current-time-in-readable-format
+
+    https://stackoverflow.com/questions/24678308/how-to-find-location-with-ip-address-in-python
+
+    https://stackoverflow.com/questions/4528099/convert-json-string-to-dict-using-python
+
+    https://github.com/sivel/speedtest-cli
 '''
 
 
 import speedtest #pip install speedtest-cli
 import time
+from datetime import datetime
+import re
+import json
+# from urllib2 import urlopen
+from urllib.request import urlopen
+from json import load
+import json
 
 s = speedtest.Speedtest()
+
+def get_ip_info( addr = ''):
+    
+    if addr == '':
+        url = 'https://ipinfo.io/json'
+    else:
+        url = 'https://ipinfo.io/' + addr + '/json'
+
+    res = urlopen(url)
+    #response from url(if res==None then check connection)
+
+    # print(res)
+    
+    data = load(res)
+    #will load the json response into data
+    # print(data)
+    
+    # for attr in data.keys():
+    #     #will print the data line by line
+    #     print(attr,' '*13+'\t->\t',data[attr])
+
+    # print[(load(res))]
+
+    # cdata = json.loads(data)
+    # print(cdata['org'])
+
+    # print(type(data))
+    # print(data['org'])
+
+    return data['org']
 
 def timeit(method):
     def timed(*args, **kw):
@@ -31,6 +78,14 @@ def timeit(method):
                   (method.__name__, (te - ts)))
         return result
     return timed
+
+def get_date_time():
+
+    c_date              = datetime.today().strftime('%Y-%m-%d')
+    now                 = datetime.now()
+    c_time              = now.strftime("%H:%M")
+
+    return c_date, c_time
 
 @timeit
 def get_custom_metrics():
@@ -47,7 +102,7 @@ def get_custom_metrics():
     time.sleep(2)
 
     # print("Pinging The Server...") 
-    ping= s.results.ping #Ping the server
+    ping = s.results.ping #Ping the server
     time.sleep(1)
 
     # print("Downloading...")
@@ -58,10 +113,9 @@ def get_custom_metrics():
     upload = s.upload() #Upload test
     time.sleep(1)
 
-    speedtest_result    = "<will_come>"
-    isp_provider        = "Railtel"
-    c_date              = "Sep 05, 2023"
-    c_time              = "5 am IST"
+    speedtest_result    = ""
+    isp_provider        = get_ip_info()
+    c_date, c_time      = get_date_time()
     c_ip                = f"{download /1024/1024:.2f} Mbit/s, {upload /1024/1024:.2f} Mbit/s"
 
     c_msg = f"""{speedtest_result}
@@ -71,7 +125,6 @@ def get_custom_metrics():
         """
 
     print(c_msg)
-
 
 def get_speed_metrics():
 
@@ -117,7 +170,15 @@ def startpy():
     # get_speed_metrics()
 
     get_custom_metrics()
-    
+
+    c_date, c_time      = get_date_time()
+    # print(c_date)
+    # print(c_time)
+
+    # c_ip = get_ip_details()
+    # print(c_ip)
+
+    # ip_info()
 
 if __name__ == '__main__':
     startpy()
